@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ActivitySys.mapper.EventsMapper">
+    
+    <resultMap type="Events" id="EventsResult">
+        <result property="EventId"    column="EventId"    />
+        <result property="EventName"    column="EventName"    />
+        <result property="EventContent"    column="EventContent"    />
+        <result property="MaxJoin"    column="MaxJoin"    />
+        <result property="PublishTime"    column="PublishTime"    />
+        <result property="EndTime"    column="EndTime"    />
+        <result property="EventStatus"    column="EventStatus"    />
+    </resultMap>
+
+    <sql id="selectEventsVo">
+        select EventId, EventName, EventContent, MaxJoin, PublishTime, EndTime, EventStatus from events
+    </sql>
+
+    <select id="selectEventsList" parameterType="Events" resultMap="EventsResult">
+        <include refid="selectEventsVo"/>
+        <where>  
+            <if test="EventName != null  and EventName != ''"> and EventName like concat('%', #{EventName}, '%')</if>
+            <if test="EventStatus != null  and EventStatus != ''"> and EventStatus = #{EventStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectEventsByEventId" parameterType="Integer" resultMap="EventsResult">
+        <include refid="selectEventsVo"/>
+        where EventId = #{EventId}
+    </select>
+        
+    <insert id="insertEvents" parameterType="Events">
+        insert into events
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="EventId != null">EventId,</if>
+            <if test="EventName != null">EventName,</if>
+            <if test="EventContent != null">EventContent,</if>
+            <if test="MaxJoin != null">MaxJoin,</if>
+            <if test="PublishTime != null">PublishTime,</if>
+            <if test="EndTime != null">EndTime,</if>
+            <if test="EventStatus != null">EventStatus,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="EventId != null">#{EventId},</if>
+            <if test="EventName != null">#{EventName},</if>
+            <if test="EventContent != null">#{EventContent},</if>
+            <if test="MaxJoin != null">#{MaxJoin},</if>
+            <if test="PublishTime != null">#{PublishTime},</if>
+            <if test="EndTime != null">#{EndTime},</if>
+            <if test="EventStatus != null">#{EventStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEvents" parameterType="Events">
+        update events
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="EventName != null">EventName = #{EventName},</if>
+            <if test="EventContent != null">EventContent = #{EventContent},</if>
+            <if test="MaxJoin != null">MaxJoin = #{MaxJoin},</if>
+            <if test="PublishTime != null">PublishTime = #{PublishTime},</if>
+            <if test="EndTime != null">EndTime = #{EndTime},</if>
+            <if test="EventStatus != null">EventStatus = #{EventStatus},</if>
+        </trim>
+        where EventId = #{EventId}
+    </update>
+
+    <delete id="deleteEventsByEventId" parameterType="Integer">
+        delete from events where EventId = #{EventId}
+    </delete>
+
+    <delete id="deleteEventsByEventIds" parameterType="String">
+        delete from events where EventId in 
+        <foreach item="EventId" collection="array" open="(" separator="," close=")">
+            #{EventId}
+        </foreach>
+    </delete>
+</mapper>

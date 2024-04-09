@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ActivitySys.mapper.RegistrationsMapper">
+    
+    <resultMap type="Registrations" id="RegistrationsResult">
+        <result property="RegId"    column="RegId"    />
+        <result property="UserId"    column="UserId"    />
+        <result property="EventId"    column="EventId"    />
+        <result property="RegStatus"    column="RegStatus"    />
+        <result property="RegTime"    column="RegTime"    />
+    </resultMap>
+
+    <sql id="selectRegistrationsVo">
+        select RegId, UserId, EventId, RegStatus, RegTime from registrations
+    </sql>
+
+    <select id="selectRegistrationsList" parameterType="Registrations" resultMap="RegistrationsResult">
+        <include refid="selectRegistrationsVo"/>
+        <where>  
+            <if test="UserId != null "> and UserId = #{UserId}</if>
+            <if test="EventId != null "> and EventId = #{EventId}</if>
+            <if test="RegStatus != null  and RegStatus != ''"> and RegStatus = #{RegStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectRegistrationsByRegId" parameterType="Integer" resultMap="RegistrationsResult">
+        <include refid="selectRegistrationsVo"/>
+        where RegId = #{RegId}
+    </select>
+        
+    <insert id="insertRegistrations" parameterType="Registrations" useGeneratedKeys="true" keyProperty="RegId">
+        insert into registrations
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="UserId != null">UserId,</if>
+            <if test="EventId != null">EventId,</if>
+            <if test="RegStatus != null">RegStatus,</if>
+            <if test="RegTime != null">RegTime,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="UserId != null">#{UserId},</if>
+            <if test="EventId != null">#{EventId},</if>
+            <if test="RegStatus != null">#{RegStatus},</if>
+            <if test="RegTime != null">#{RegTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRegistrations" parameterType="Registrations">
+        update registrations
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="UserId != null">UserId = #{UserId},</if>
+            <if test="EventId != null">EventId = #{EventId},</if>
+            <if test="RegStatus != null">RegStatus = #{RegStatus},</if>
+            <if test="RegTime != null">RegTime = #{RegTime},</if>
+        </trim>
+        where RegId = #{RegId}
+    </update>
+
+    <delete id="deleteRegistrationsByRegId" parameterType="Integer">
+        delete from registrations where RegId = #{RegId}
+    </delete>
+
+    <delete id="deleteRegistrationsByRegIds" parameterType="String">
+        delete from registrations where RegId in 
+        <foreach item="RegId" collection="array" open="(" separator="," close=")">
+            #{RegId}
+        </foreach>
+    </delete>
+</mapper>

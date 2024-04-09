@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.AboutSys.mapper.FeedbackMapper">
+    
+    <resultMap type="Feedback" id="FeedbackResult">
+        <result property="fbId"    column="fb_id"    />
+        <result property="uid"    column="uid"    />
+        <result property="fbTitle"    column="fb_title"    />
+        <result property="fbContent"    column="fb_content"    />
+        <result property="fbStatus"    column="fb_status"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectFeedbackVo">
+        select fb_id, uid, fb_title, fb_content, fb_status, create_time from feedback
+    </sql>
+
+    <select id="selectFeedbackList" parameterType="Feedback" resultMap="FeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        <where>  
+            <if test="uid != null "> and uid = #{uid}</if>
+            <if test="fbTitle != null  and fbTitle != ''"> and fb_title like concat('%', #{fbTitle}, '%')</if>
+            <if test="fbStatus != null  and fbStatus != ''"> and fb_status = #{fbStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectFeedbackByFbId" parameterType="Integer" resultMap="FeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        where fb_id = #{fbId}
+    </select>
+        
+    <insert id="insertFeedback" parameterType="Feedback" useGeneratedKeys="true" keyProperty="fbId">
+        insert into feedback
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null">uid,</if>
+            <if test="fbTitle != null">fb_title,</if>
+            <if test="fbContent != null and fbContent != ''">fb_content,</if>
+            <if test="fbStatus != null and fbStatus != ''">fb_status,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null">#{uid},</if>
+            <if test="fbTitle != null">#{fbTitle},</if>
+            <if test="fbContent != null and fbContent != ''">#{fbContent},</if>
+            <if test="fbStatus != null and fbStatus != ''">#{fbStatus},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFeedback" parameterType="Feedback">
+        update feedback
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null">uid = #{uid},</if>
+            <if test="fbTitle != null">fb_title = #{fbTitle},</if>
+            <if test="fbContent != null and fbContent != ''">fb_content = #{fbContent},</if>
+            <if test="fbStatus != null and fbStatus != ''">fb_status = #{fbStatus},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where fb_id = #{fbId}
+    </update>
+
+    <delete id="deleteFeedbackByFbId" parameterType="Integer">
+        delete from feedback where fb_id = #{fbId}
+    </delete>
+
+    <delete id="deleteFeedbackByFbIds" parameterType="String">
+        delete from feedback where fb_id in 
+        <foreach item="fbId" collection="array" open="(" separator="," close=")">
+            #{fbId}
+        </foreach>
+    </delete>
+</mapper>
